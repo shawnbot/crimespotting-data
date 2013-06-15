@@ -1,5 +1,5 @@
-# /data
-This is where the magic happens. The `Makefile` in this directory contains tasks for fetching, munging, and storing data from San Francisco's data repository. Here are the tasks you'll find useful:
+# crimespotting-data
+The `Makefile` in this directory contains tasks for fetching, munging, and storing data from San Francisco's data repository. Here are the tasks you'll find useful:
 
 ## `make db`
 Create the sqlite database `archive.db` and the relevant tables: `updates` and `reports`.
