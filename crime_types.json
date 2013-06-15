@@ -1,0 +1,47 @@
+{
+    "valid": [
+        "AGGRAVATED ASSAULT",
+        "MURDER",
+        "ROBBERY",
+        "SIMPLE ASSAULT",
+        "DISTURBING THE PEACE",
+        "NARCOTICS",
+        "ALCOHOL",
+        "PROSTITUTION",
+        "THEFT",
+        "VEHICLE THEFT",
+        "VANDALISM",
+        "BURGLARY",
+        "ARSON"
+    ],
+
+    "mapping": {
+        "ASSAULT/BATTERY":  "AGGRAVATED ASSAULT",
+        "STABBING/CUTTING": "AGGRAVATED ASSAULT",
+        "AGGR ASSAULT/ADW": "AGGRAVATED ASSAULT",
+        "SEXUAL ASSAULT":   "AGGRAVATED ASSAULT",
+        "SEX OFFENSES, FORCIBLE": "AGGRAVATED ASSAULT",
+        "HOMICIDE":         "MURDER",
+        "STRONGARM ROB.":   "ROBBERY",
+        "PURSESNATCH":      "ROBBERY",
+        "ASSAULT":          "SIMPLE ASSAULT",
+        "FIGHT-NO WEAPONS": "SIMPLE ASSAULT",
+        "ASSAULT/BATTERY":  "SIMPLE ASSAULT",
+        "FIGHT W/WEAPON":   "SIMPLE ASSAULT",
+        "NOISE NUISANCE":       "DISTURBING THE PEACE",
+        "DISORDERLY CONDUCT":   "DISTURBING THE PEACE",
+        "INTOX PERSON":     "ALCOHOL",
+        "DRUNKENNESS":      "ALCOHOL",
+        "DRUNK DRIVER":     "ALCOHOL",
+        "DRIVING UNDER THE INFLUENCE": "ALCOHOL",
+        "LIQUOR LAWS":      "ALCOHOL",
+        "SOLICITING PROS":  "PROSTITUTION",
+        "LARCENY/THEFT":    "THEFT",
+        "PETTY THEFT":      "THEFT",
+        "GRAND THEFT":      "THEFT",
+        "STOLEN VEHICLE":   "VEHICLE THEFT",
+        "AUTO BOOST/STRIP": "VEHICLE THEFT",
+        "PER.BREAKING IN":  "BURGLARY",
+        "DRUG/NARCOTIC":    "NARCOTICS"
+    }
+}
