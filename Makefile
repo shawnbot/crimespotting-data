@@ -1,5 +1,4 @@
 BASE_URL ?= http://apps.sfgov.org/datafiles/view.php?file=Police
-IN_COLUMNS ?= IncidntNum,Category,Descript,DayOfWeek,Date,Time,PdDistrict,Resolution,Location,X,Y
 
 DB ?= archive.db
 TABLE ?= updates
@@ -16,19 +15,19 @@ flush:
 	sqlite3 $(DB) < create.sql
 
 update: $(FILE) $(DB)
-	$(call _insert,$(FILE),updates)
+	$(call update_with_file,$(FILE))
 
 update-archive: download/archive.csv $(DB)
-	$(call _insert,$<,updates)
+	$(call update_with_file,$<)
 
 update-daily: download/delta-daily.csv $(DB)
-	$(call _insert,$<,updates)
+	$(call update_with_file,$<)
 
 update-weekly: download/delta-weekly.csv $(DB)
-	$(call _insert,$<,updates)
+	$(call update_with_file,$<)
 
 update-90d: download/delta-90d.csv $(DB)
-	$(call _insert,$<,updates)
+	$(call update_with_file,$<)
 
 download/archive.csv: download
 	cd download && \
@@ -36,21 +35,21 @@ download/archive.csv: download
 		unzip sfpd_incident_all_csv.zip && \
 		head -1 sfpd_incident_`date +%Y`.csv > archive.csv && \
 		cat sfpd_incident_????.csv | egrep -v IncidntNum >> archive.csv
-	$(call _repair,$@)
+	$(call repair_csv,$@)
 
 download/delta-daily.csv: download
 	# download daily delta
 	curl $(BASE_URL)/incident_changes_from_previous_day.json > download/delta-daily.json
 	# convert from GeoJSON to CSV
 	./tools/ogr2csv.sh download/delta-daily.json $@
-	$(call _repair,$@)
+	$(call repair_csv,$@)
 
 download/delta-weekly.csv: download
 	# download daily delta
 	curl $(BASE_URL)/one_week_city_wide_incidents.json > download/delta-weekly.json
 	# convert from GeoJSON to CSV
 	./tools/ogr2csv.sh download/delta-weekly.json $@
-	$(call _repair,$@)
+	$(call repair_csv,$@)
 
 download/delta-90d.csv: download
 	cd download && \
@@ -58,7 +57,7 @@ download/delta-90d.csv: download
 		unzip -o CrimeIncidentShape_90-All.zip
 	# convert from Shapefile to CSV
 	./tools/ogr2csv.sh download/incidcomshape.shp $@
-	$(call _repair,$@)
+	$(call repair_csv,$@)
 
 download:
 	mkdir -p $@
@@ -70,11 +69,13 @@ clean:
 distclean: clean
 	rm -f archive.db
 
-define _insert
-	csvsql --db "sqlite:///$(DB)" --insert --no-create --table $2 < $1
+define update_with_file
+	sqlite3 $(DB) < flush-updates.sql
+	csvsql --db "sqlite:///$(DB)" --insert --no-create --table updates < $1
+	sqlite3 $(DB) < sync.sql
 endef
 
-define _repair
+define repair_csv
 	python tools/repair.py $@ > $@.repaired
 	mv $@.repaired $@
 endef
