@@ -1,32 +1,33 @@
 BASE_URL ?= http://apps.sfgov.org/datafiles/view.php?file=Police
 
-DB ?= archive.db
-TABLE ?= updates
+DB_FILE ?= archive.db
+DB_EXEC ?= sqlite3 $(DB_FILE)
+DB_JDBC ?= "sqlite:///$(DB_FILE)"
 
-all: $(DB) update-90d sync
+all: $(DB_FILE) update-90d sync
 
-$(DB):
-	sqlite3 $(DB) < sql/create.sql
+$(DB_FILE):
+	$(DB_EXEC) < sql/create.sql
 
-sync: $(DB)
-	sqlite3 $(DB) < sql/sync.sql
+sync: $(DB_FILE)
+	$(DB_EXEC) < sql/sync.sql
 
 flush:
-	sqlite3 $(DB) < sql/create.sql
+	$(DB_EXEC) < sql/create.sql
 
-update: $(FILE) $(DB)
+update: $(FILE) $(DB_FILE)
 	$(call update_with_file,$(FILE))
 
-update-archive: download/archive.csv $(DB)
+update-archive: download/archive.csv $(DB_FILE)
 	$(call update_with_file,$<)
 
-update-daily: download/delta-daily.csv $(DB)
+update-daily: download/delta-daily.csv $(DB_FILE)
 	$(call update_with_file,$<)
 
-update-weekly: download/delta-weekly.csv $(DB)
+update-weekly: download/delta-weekly.csv $(DB_FILE)
 	$(call update_with_file,$<)
 
-update-90d: download/delta-90d.csv $(DB)
+update-90d: download/delta-90d.csv $(DB_FILE)
 	$(call update_with_file,$<)
 
 download/archive.csv: download
@@ -64,15 +65,17 @@ download:
 
 clean:
 	rm -rf download/*
-	-sqlite3 $(DB) "DELETE FROM updates;" >> /dev/null
+	$(DB_EXEC) < sql/flush-updates.sql
 
 distclean: clean
-	rm -f archive.db
+	if [ -f $(DB_FILE) ]; then \
+		rm -f $(DB_FILE); \
+	fi
 
 define update_with_file
-	sqlite3 $(DB) < sql/flush-updates.sql
-	csvsql --db "sqlite:///$(DB)" --insert --no-create --table updates < $1
-	sqlite3 $(DB) < sql/sync.sql
+	$(DB_EXEC) < sql/flush-updates.sql
+	csvsql --db $(DB_JDBC) --insert --no-create --table updates < $1
+	$(DB_EXEC) < sql/sync.sql
 endef
 
 define repair_csv
