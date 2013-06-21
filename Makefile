@@ -6,13 +6,13 @@ TABLE ?= updates
 all: $(DB) update-90d sync
 
 $(DB):
-	sqlite3 $(DB) < create.sql
+	sqlite3 $(DB) < sql/create.sql
 
 sync: $(DB)
-	sqlite3 $(DB) < sync.sql
+	sqlite3 $(DB) < sql/sync.sql
 
 flush:
-	sqlite3 $(DB) < create.sql
+	sqlite3 $(DB) < sql/create.sql
 
 update: $(FILE) $(DB)
 	$(call update_with_file,$(FILE))
@@ -70,9 +70,9 @@ distclean: clean
 	rm -f archive.db
 
 define update_with_file
-	sqlite3 $(DB) < flush-updates.sql
+	sqlite3 $(DB) < sql/flush-updates.sql
 	csvsql --db "sqlite:///$(DB)" --insert --no-create --table updates < $1
-	sqlite3 $(DB) < sync.sql
+	sqlite3 $(DB) < sql/sync.sql
 endef
 
 define repair_csv
