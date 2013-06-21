@@ -25,6 +25,7 @@ INSERT OR REPLACE INTO reports (
 FROM updates
 WHERE
     type IS NOT NULL
+    AND date <= date()
     AND X IS NOT NULL
     AND Y IS NOT NULL
     AND Date IS NOT NULL
